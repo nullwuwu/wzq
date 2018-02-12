@@ -20,7 +20,7 @@
 
 <script>
 import io from 'socket.io-client'
-const socket = io('http://172.16.23.37:3300/')
+const socket = io('http://0.0.0.0:3300/')
 export default {
   name:'HelloWorld',
   data () {
@@ -42,7 +42,7 @@ export default {
   },
   created () {
     socket.on('gameStatus', function (data) {
-      console.log(data)
+      console.log('游戏状态', data)
     })
     socket.on('gameStart', (data) => {
       this.gameStatus = data
@@ -88,7 +88,7 @@ export default {
       }
       socket.emit('ready', p)
     },
-    isWin(k, x, p) {
+    isWin1(k, x, p) {
       // 计数器
       let count = 0
       // 水平方向
@@ -103,6 +103,7 @@ export default {
         count++
       }
       if (count >= 5) {
+        debugger
         return true
       }
       // 垂直方向
@@ -119,6 +120,46 @@ export default {
       if (count >= 5) {
         return true
       }
+    },
+    isWin(k, x, p) {
+      console.log(this.boardStatus)
+      // 垂直方向
+      if (this.boardStatus[k - 1][x] === p || this.boardStatus[k + 1][x] === p) {
+        // 计数器
+        let count = 0
+        let y1 = k
+        while (y1 > -1 && this.boardStatus[y1][x] === p) {
+          count++
+          y1--
+        }
+        let y2 = k + 1
+        while (y2 > this.boardStatus.length - 1 && this.boardStatus[y2][x] === p) {
+          count++
+          y2++
+        }
+        if (count >= 5) {
+          return true
+        }
+      }
+      // 水平
+      if (this.boardStatus[k][x - 1] === p || this.boardStatus[k][x - 1] === p) {
+        // 计数器
+        let count = 0
+        let x1 = x
+        while (x1 > -1 && this.boardStatus[k][x1] === p) {
+          count++
+          x1--
+        }
+        let x2 = x
+        while (x2 < this.boardStatus[k].length - 1 && this.boardStatus[k][x2] === p) {
+          count++
+          x2++
+        }
+        if (count >= 5) {
+          return true
+        }
+      }
+
     }
   }
 }
